@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Virtual Environment
+venv/
+env/
+.env/
+
+# Data and Cleaning (Generated files)
+Data_Cleaning/Raw_data
+General_docs/
+
+
+# Models and Scalers (Large binary files)
+# Models/**/*.keras
+# Models/**/*.h5
+# Models/**/*.pkl
+# *.keras
+# *.pkl
+
+# Visualization & Output
+*.png
+*.jpg
+*.jpeg
+prediction_comparison.png
+prediction_plot.png
+prediction_plot_refined.png
+next_month_prediction.png
+
+# Training logs
+training_log.txt
+*.log
+
+# IDE Specific
+.vscode/
+.idea/
+*.swp
+*.swo
