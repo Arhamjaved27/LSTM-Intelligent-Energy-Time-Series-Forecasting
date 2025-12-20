@@ -24,17 +24,53 @@ A powerful Deep Learning system designed to forecast energy consumption and sola
 
 ## 🛠️ Installation & Setup
 
-1. **Activate Virtual Environment** (Recommended):
-   ```powershell
-   .\venv\Scripts\activate
-   ```
+This section helps you get the project running on Windows (recommended Python versions and copy-paste commands).
 
-2. **Install Dependencies**:
-   ```powershell
-   pip install -r requirements.txt
-   ```
+1. **Requirements**: Python 3.9 - 3.11 (64-bit), `pip`, and Git (optional).
 
----
+2. **Create & activate a virtual environment** (PowerShell):
+```powershell
+python -m venv venv
+# PowerShell
+.\venv\Scripts\Activate.ps1
+# or CMD
+.\venv\Scripts\activate.bat
+```
+
+3. **Upgrade pip and install dependencies**:
+```powershell
+pip install -r requirements.txt
+```
+
+4. **Optional — GPU acceleration**
+- If you have an NVIDIA GPU and want TensorFlow GPU support, follow TensorFlow's official GPU installation guide and install the matching CUDA/cuDNN versions for your TensorFlow release. Ensure your NVIDIA drivers are up to date. If you prefer not to configure GPU, the CPU build works out of the box.
+
+5. **Place cleaned data**
+- Put your cleaned CSV(s) inside the `Data_Cleaning/` folder. Example filenames in this repo include `CivicCenter_Data_Cleaned.csv` and `SchoolP_Data_Cleaned.csv`.
+
+6. **Run training scripts**
+- Single-column (consumption-only) training:
+```powershell
+python SingleCol_Model_train.py
+```
+- General training (production + consumption):
+```powershell
+python General_Model_Train.py
+```
+
+7. **Run prediction scripts**
+- After training, generate forecasts:
+```powershell
+python General_Predict.py
+# or
+python SingleCol_Predict.py
+```
+
+8. **Deactivate virtual environment**
+```powershell
+deactivate
+```
+
 
 ## 📖 Execution Guide
 
