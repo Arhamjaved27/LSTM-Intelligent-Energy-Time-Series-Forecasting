@@ -88,8 +88,8 @@ def create_sequences(data, input_steps, output_steps):
         
     return np.array(X), np.array(y)
 
-def train_model():
-    input_file = 'School_Data_Cleaned.csv'
+def train_model(dataset_name):
+    input_file = f'{dataset_name}_Data_Cleaned.csv'
     if not os.path.exists(input_file):
         print(f"File {input_file} not found!")
         return
@@ -115,7 +115,7 @@ def train_model():
     # We also need a scaler just for the target variables to invert predictions easily
     target_scaler = MinMaxScaler(feature_range=(0, 1))
     target_scaler.fit(df[['Produccion_kWh', 'Consum_kWh']]) # Fit only on original targets
-    joblib.dump(target_scaler, 'target_scaler_train.pkl')
+    joblib.dump(target_scaler, 'target_scaler.pkl')
     
     # Sequence Generation
     input_months = 3
@@ -183,8 +183,8 @@ def train_model():
         verbose=1
     )
     
-    model.save('best_lstm_model.keras')
-    print("Model saved to 'best_lstm_model.keras'")
+    model.save(f'{dataset_name}_lstm.keras')
+    print(f"Model saved to '{dataset_name}_lstm.keras'")
     
     # Evaluation & Plotting
     print("Evaluating on Test Set...")
@@ -223,8 +223,9 @@ def train_model():
     print(f"Test MAE: {score[1]}")
 
 if __name__ == "__main__":
+    dataset_name = "SchoolP"
     try:
-        train_model()
+        train_model(dataset_name)
     except Exception as e:
         print(f"An error occurred: {e}")
         import traceback
