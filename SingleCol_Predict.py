@@ -6,6 +6,7 @@ import joblib
 import holidays
 import os
 import matplotlib.pyplot as plt
+import requests
 
 def create_features(df):
     # Adds cyclical time features and holiday flags for single-column prediction.
@@ -37,14 +38,46 @@ def create_features(df):
 
     return df
 
-def predict_next_month(data_path, model_dir):
-    # Extract name after / and before _
-    # e.g., "Models/SportsCenter_model" -> "SportsCenter"
-    basename = os.path.basename(model_dir.rstrip('/\\'))
-    extracted_name = basename.split('_')[0]
-    
+def send_data(RMAIN_IP, PORT, SITE_NAME, predicted):
+    # Construct URL
+    URL = f"http://{RMAIN_IP}:{PORT}/upload_json"
+
+    # Reset index to convert 'Hora' from index to column
+    predicted = predicted.reset_index()
+
+    # Ensure timestamp is datetime
+    predicted["Hora"] = pd.to_datetime(predicted["Hora"])
+
+    # Extract month automatically (YYYY-MM)
+    MONTH = predicted["Hora"].iloc[0].strftime("%Y-%m")
+
+    # Convert Timestamp to string for JSON serialization
+    predicted["Hora"] = predicted["Hora"].astype(str)
+
+    # SEND DATAFRAME AS JSON
+    payload = {
+        "site": SITE_NAME,
+        "month": MONTH,
+        "data": predicted.to_dict(orient="records")
+    }
+
+    response = requests.post(URL, json=payload, timeout=15)
+
+    if response.status_code == 200:
+        print("✅ DataFrame sent successfully")
+        print(response.json())
+    else:
+        print("❌ Error sending data:", response.text)
+
+
+
+
+
+
+def predict_next_month(model_name, data_path, model_dir):
+       
     # Paths
-    model_path = os.path.join(model_dir, f"{extracted_name}_lstm.keras")
+    model_path = os.path.join(model_dir, f"{model_name}_lstm.keras")
     feature_scaler_path = os.path.join(model_dir, 'feature_scaler.pkl')
     target_scaler_path = os.path.join(model_dir, 'target_scaler.pkl')
     
@@ -56,7 +89,7 @@ def predict_next_month(data_path, model_dir):
             print(f"Error: Model not found in {model_dir}")
             return
 
-    print(f"Loading model and scalers for {extracted_name}...")
+    print(f"Loading model and scalers for {model_name}...")
     model = tf.keras.models.load_model(model_path)
     feature_scaler = joblib.load(feature_scaler_path)
     target_scaler = joblib.load(target_scaler_path)
@@ -82,7 +115,7 @@ def predict_next_month(data_path, model_dir):
     # Reshape for LSTM: (1, 2160, n_features)
     X_input = input_scaled.reshape(1, n_input, input_scaled.shape[1])
     
-    print(f"Predicting next 30 days for {extracted_name}...")
+    print(f"Predicting next 30 days for {model_name}...")
     # Prediction
     y_pred_scaled = model.predict(X_input)[0] # Shape (720, 1)
     
@@ -95,20 +128,22 @@ def predict_next_month(data_path, model_dir):
     
     # Create DataFrame
     pred_df = pd.DataFrame(y_pred, columns=['Consum_kWh'], index=future_dates)
+    # Name the index column so exported CSV contains the header 'hora'
+    pred_df.index.name = 'Hora'
     pred_df[pred_df < 0] = 0 # Safety rule
     pred_df = pred_df.round(2)
 
     # Save outputs
     os.makedirs('Model_output', exist_ok=True)
     
-    csv_path = f'Model_output/{extracted_name}_SingleCol_Prediction.csv'
+    csv_path = f'Model_output/{model_name}_SingleCol_Prediction.csv'
     pred_df.to_csv(csv_path)
     print(f"Predictions saved to {csv_path}")
     
-    plot_path = f'Model_output/{extracted_name}_SingleCol_Plot.png'
+    plot_path = f'Model_output/{model_name}_SingleCol_Plot.png'
     plt.figure(figsize=(15, 6))
     plt.plot(pred_df.index, pred_df['Consum_kWh'], color='cyan', label='Predicted Consumption')
-    plt.title(f'Forecast: {extracted_name} Energy Consumption (Next 30 Days)')
+    plt.title(f'Forecast: {model_name} Energy Consumption (Next 30 Days)')
     plt.xlabel('Date')
     plt.ylabel('kWh')
     plt.legend()
@@ -119,22 +154,25 @@ def predict_next_month(data_path, model_dir):
     
     print(f"\nFinal Total Consumption prediction: {pred_df['Consum_kWh'].sum():.2f} kWh")
 
+    return pred_df 
+    
+
 if __name__ == "__main__":
     
-    # predict next month for Civil Center:
-    # data_path = 'Data_Cleaning/CivilCenter_Data_Cleaned.csv'
-    # model_path = "Models/CivilCenter_model"
-    
-    # predict next month for Sports Center:
-    # data_path = 'Data_Cleaning/SportsCenter_Data_Cleaned.csv'
-    # model_path = "Models/SportsCenter_model"
-
+    # model_name = "CivilCenter"  
+    # model_name = "SportsCenter"  
+    model_name = "SportsArea"
 
      # predict next month for Sports Area:
-    data_path = 'Data_Cleaning/SportsArea_Data_Cleaned.csv'
-    model_path = "Models/SportsArea_model"
+    data_path = f"Data_Cleaning/{model_name}_Data_Cleaned.csv"
+    model_path = f"Models/{model_name}_model"
+
+    # CONFIG
+    RMAIN_IP = "192.168.1.15"   # CHANGE THIS acording to your R-MAIN IP
+    PORT = 5000
 
     if os.path.exists(data_path):
-        predict_next_month(data_path, model_path)
+        result = predict_next_month(model_name, data_path, model_path)
+        send_data(RMAIN_IP, PORT, model_name, result)
     else:
         print(f"Wait: {data_path} not found. Please check paths in __main__.")

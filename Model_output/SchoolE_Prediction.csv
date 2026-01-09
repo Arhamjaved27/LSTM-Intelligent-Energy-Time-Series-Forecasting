@@ -1,4 +1,4 @@
-,Produccion_kWh,Consum_kWh
+Hora,Produccion_kWh,Consum_kWh
 2024-01-01 00:00:00,0.0,2.65
 2024-01-01 01:00:00,0.0,2.13
 2024-01-01 02:00:00,0.0,1.89

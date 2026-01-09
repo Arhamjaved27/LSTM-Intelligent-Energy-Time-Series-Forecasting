@@ -43,3 +43,7 @@ training_log.txt
 *.swp
 *.swo
 
+
+# files
+SingleCol_Synthetic.py
+General_Synthetic.py

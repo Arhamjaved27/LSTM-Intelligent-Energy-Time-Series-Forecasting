@@ -8,3 +8,4 @@ seaborn
 joblib
 openpyxl
 scipy
+requests
