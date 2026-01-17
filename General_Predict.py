@@ -163,8 +163,7 @@ def predict_next_month(model_name, data_path, model_dir):
     plt.legend()
     
     plt.tight_layout()
-    # plot_name = f'Model_output/{model_name}_Forecast_Plot.png'
-    plot_name = f'C:/Users/Arham/Downloads/{model_name}_Forecast_Plot.png'
+    plot_name = f'Model_output/{model_name}_Forecast_Plot.png'
     plt.savefig(plot_name)
     print(f"Forecast plot saved to '{plot_name}'")
     
