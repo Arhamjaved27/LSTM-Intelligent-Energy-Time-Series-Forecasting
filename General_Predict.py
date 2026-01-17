@@ -151,7 +151,7 @@ def predict_next_month(model_name, data_path, model_dir):
     plt.figure(figsize=(15, 6))
     
     plt.subplot(2, 1, 1)
-    plt.plot(pred_df.index, pred_df['Produccion_kWh'], color='orange', label='Predicted Solar Production')
+    plt.plot(pred_df.index, pred_df['Produccion_kWh'], color='red', label='Predicted Solar Production')
     plt.title(f'Forecast: {model_name} Solar Production (Next 30 Days)')
     plt.ylabel('kWh')
     plt.legend()
@@ -163,7 +163,8 @@ def predict_next_month(model_name, data_path, model_dir):
     plt.legend()
     
     plt.tight_layout()
-    plot_name = f'Model_output/{model_name}_Forecast_Plot.png'
+    # plot_name = f'Model_output/{model_name}_Forecast_Plot.png'
+    plot_name = f'C:/Users/Arham/Downloads/{model_name}_Forecast_Plot.png'
     plt.savefig(plot_name)
     print(f"Forecast plot saved to '{plot_name}'")
     
@@ -190,6 +191,6 @@ if __name__ == "__main__":
 
     if os.path.exists(data_path):
         result = predict_next_month(model_name, data_path, model_path)
-        send_data(RMAIN_IP, PORT, model_name, result)
+        # send_data(RMAIN_IP, PORT, model_name, result)
     else:
         print(f"Wait: {data_path} not found. Please check paths in __main__.")

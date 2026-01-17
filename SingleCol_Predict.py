@@ -142,7 +142,7 @@ def predict_next_month(model_name, data_path, model_dir):
     
     plot_path = f'Model_output/{model_name}_SingleCol_Plot.png'
     plt.figure(figsize=(15, 6))
-    plt.plot(pred_df.index, pred_df['Consum_kWh'], color='cyan', label='Predicted Consumption')
+    plt.plot(pred_df.index, pred_df['Consum_kWh'], color='blue', label='Predicted Consumption')
     plt.title(f'Forecast: {model_name} Energy Consumption (Next 30 Days)')
     plt.xlabel('Date')
     plt.ylabel('kWh')
